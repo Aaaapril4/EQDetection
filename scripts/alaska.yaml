@@ -1,0 +1,27 @@
+# @package _global_
+
+# dev config for inference, all files are stored in local directory
+defaults:
+  - override /trainer: single_gpu.yaml
+  - override /logger: csv.yaml
+  - override /hydra: inference_1n4g_v100.yaml
+
+data:
+  inference_requirement_path: /mnt/scratch/jieyaqi/alaska/final/pntf_alaska_all_iter2/statime$num.csv
+  inference_output_dir: /mnt/scratch/jieyaqi/alaska/final/pntf_alaska_all_iter2/result$num
+  tsindex_database_path: /mnt/scratch/jieyaqi/alaska/final/pntf_alaska_all_iter2/data$num.sqlite
+
+callbacks:
+  batch_inference_writer:
+    output_dir: /mnt/scratch/jieyaqi/alaska/final/pntf_alaska_all_iter2/result$num
+    save_prediction_stream: False
+    save_waveform_stream: False
+    save_phase_arrivals: True
+  batch_inference_step:
+    extract_phase_sensitivity: [0.1, 0.1]
+
+trainer:
+  devices: 4
+  max_epochs: 1
+
+ckpt_path: /mnt/home/jieyaqi/code/PhaseNet-TF/models/alaska.ckpt

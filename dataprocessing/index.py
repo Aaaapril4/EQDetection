@@ -43,4 +43,4 @@ if __name__ == "__main__":
     # index_rank()
 
     # run for one case, usage: per_index(directory, outputfile)
-    per_index('./data', 'data.sqlite')
+    per_index('./data/waveform', 'data/data.sqlite')

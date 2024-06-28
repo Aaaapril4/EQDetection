@@ -13,14 +13,14 @@ warnings.filterwarnings("ignore")
 comm = MPI.COMM_WORLD 
 size = comm.Get_size()
 rank = comm.Get_rank()
-station = pd.read_csv('/mnt/scratch/jieyaqi/alaska/station_all.txt', delimiter='|')
+station = pd.read_csv('data/station.txt', delimiter='|')
 start = UTCDateTime("1980-01-01T00:00:00")
 end = UTCDateTime("2017-12-31T23:59:59")
 
 
-OUTPUTS = Path(
-    "/mnt/scratch/jieyaqi/alaska/alaska_long/data")
-sq_client = sql_client("/mnt/scratch/jieyaqi/alaska/datalong.sqlite")
+OUTPUTS = Path("data/processed")
+OUTPUTS.mkdir(exist_ok=True)
+sq_client = sql_client("data/data.sqlite")
 
 
 def remove_unused_list(process_list_this_rank_raw):
@@ -69,7 +69,7 @@ def get_process_list_this_rank(station: pd.DataFrame):
     station = station.sort_values('Station')
     
     index = 0
-    staList = station.apply(lambda x: f'{x["Network"]}.{x["Station"]}', axis = 1).to_numpy()
+    staList = station.apply(lambda x: f'{x["#Network"]}.{x["Station"]}', axis = 1).to_numpy()
     trunk = 10
     num = int(np.ceil((end - start)/ (60 * 60 * 24) / trunk))
 

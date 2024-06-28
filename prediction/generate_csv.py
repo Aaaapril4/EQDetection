@@ -9,7 +9,7 @@ starttime = UTCDateTime("2018-01-01T00:00:00")
 endtime = UTCDateTime("2019-02-28T23:59:59")
 
 
-def generate_csv(datadir, output):
+def generate_csv(datadir: Path, output: Path):
     df = pd.DataFrame()
 
     for sta in staList:

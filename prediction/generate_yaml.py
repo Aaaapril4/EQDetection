@@ -1,6 +1,6 @@
 from string import Template
 
-def generate_yaml(num):
+def generate_yaml(num: int):
     with open('scripts_phasenet/alaska_tonga.yaml', 'r') as f:
         tem = f.readlines()
 

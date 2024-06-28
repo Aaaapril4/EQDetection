@@ -10,25 +10,21 @@ from obspy import UTCDateTime
 
 warnings.filterwarnings("ignore")
 
-comm = MPI.COMM_WORLD  # pylint: disable=c-extension-no-member
+comm = MPI.COMM_WORLD 
 size = comm.Get_size()
 rank = comm.Get_rank()
-station = pd.read_csv('/mnt/home/jieyaqi/code/AlaskaEQ/data/station.txt', delimiter='|')
-station = station[station['Longitude'] >= -164]
-station['EndTime'] = station['EndTime'].fillna('2070-06-30T00:00:00')
-station['StartTime'] = station['StartTime'].apply(lambda x: UTCDateTime(x)) 
-station['EndTime'] = station['EndTime'].apply(lambda x: UTCDateTime(x)) 
-start = UTCDateTime("2019-01-01T00:00:00")
-end = UTCDateTime("2019-03-01T00:00:00")
+station = pd.read_csv('/mnt/scratch/jieyaqi/alaska/station_all.txt', delimiter='|')
+start = UTCDateTime("1980-01-01T00:00:00")
+end = UTCDateTime("2017-12-31T23:59:59")
 
 
 OUTPUTS = Path(
-    "/mnt/scratch/jieyaqi/alaska/final/pntf_alaska_v1/data")
-sq_client = sql_client("/mnt/scratch/jieyaqi/alaska/data.sqlite")
+    "/mnt/scratch/jieyaqi/alaska/alaska_long/data")
+sq_client = sql_client("/mnt/scratch/jieyaqi/alaska/datalong.sqlite")
 
 
 def remove_unused_list(process_list_this_rank_raw):
-    # clean this rank
+    # remove traces processed or no data
     filtered = []
     for index, net, sta, starttime, endtime in process_list_this_rank_raw:
         try:
@@ -67,10 +63,11 @@ def remove_unused_list(process_list_this_rank_raw):
     return res_each_rank, total
 
 
-def get_process_list_this_rank(station):
-    # get all array
+def get_process_list_this_rank(station: pd.DataFrame):
+    # get process list for every rank
     process_list = []
-
+    station = station.sort_values('Station')
+    
     index = 0
     staList = station.apply(lambda x: f'{x["Network"]}.{x["Station"]}', axis = 1).to_numpy()
     trunk = 10
@@ -95,7 +92,16 @@ def get_process_list_this_rank(station):
     return process_list_this_rank, total
 
 
-def process_kernel(index, net, sta, starttime, endtime, total):
+def process_kernel(
+        index: int, 
+        net: str, 
+        sta: str, 
+        starttime: UTCDateTime, 
+        endtime: UTCDateTime, 
+        total: int):
+    # process each trace
+    # get data
+    # use net and station if stations with duplicated name exist
     try:
         st = sq_client.get_waveforms_bulk(
             [(net, sta, "*", "*", starttime - 60, endtime + 60)], None)
@@ -141,7 +147,7 @@ def process_kernel(index, net, sta, starttime, endtime, total):
     
     st.trim(starttime, endtime)
 
-    # padding other channels
+    # padding other channels if none
     channels = []
     for tr in st:
         channels.append(tr.stats.channel[2])

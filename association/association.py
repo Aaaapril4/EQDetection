@@ -74,19 +74,19 @@ def get_config() -> dict:
                         "zlim": config["z(km)"], 
                         "h": 1,
                         "vel": {"p": Vp, "s": Vs, "z": d}}
-    return config
+    return config, proj
     
 
-picks = pd.read_csv('phase_arrivals.csv')
+picks = pd.read_csv('data/picks_raw.csv')
 picks = filter_picks(picks, 0.5, 0.5)
 picks['timestamp'] = picks['timestamp'].apply(lambda x: pd.Timestamp(x[:-1]))
 picks = picks.sort_values("timestamp", ignore_index = True)
 
-stations = pd.read_csv('stations.csv')
+config, proj = get_config()
+
+stations = pd.read_csv('data/stations.csv')
 stations[["x(km)", "y(km)"]] = stations.apply(lambda x: pd.Series(proj(longitude=x.longitude, latitude=x.latitude)), axis=1)
 stations["z(km)"] = stations["elevation(m)"].apply(lambda x: -x/1e3)
-
-config = get_config()
 
 event_idx0 = 0  ## current earthquake index
 assignments = []

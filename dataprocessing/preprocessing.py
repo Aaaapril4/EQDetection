@@ -7,6 +7,11 @@ from loguru import logger
 from mpi4py import MPI
 from obspy.clients.filesystem.tsindex import Client as sql_client
 from obspy import UTCDateTime
+######## remove instrumental response
+# from obspy import UTCDateTime, read_inventory
+# from obspy.clients.fdsn import Client as fdsn_Client
+# fdsn_client = fdsn_Client("IRIS", timeout=600)
+########
 
 warnings.filterwarnings("ignore")
 
@@ -118,6 +123,31 @@ def process_kernel(
     st.detrend("demean")
     st.taper(max_percentage=0.002, type="hann")
     
+    ####### remove instrumental response
+    # pre_filt = [0.01, 0.05, 20, 50]
+
+    # try:
+    #     inv = read_inventory(XMLS/f"{st[0].stats.network}.{st[0].stats.station}.xml")
+    #     st.remove_response(output="VEL", pre_filt=pre_filt, zero_mean=False,
+    #                 taper=False, inventory=inv)
+    # except (ValueError, FileNotFoundError):
+    #     inv = fdsn_client.get_stations(
+    #             network = st[0].stats.network,
+    #             station = st[0].stats.station,
+    #             channel = "HH?,BH?,EH?,SH?",
+    #             starttime = starttime,
+    #             endtime = endtime,
+    #             level='response'
+    #         )
+    #     try:
+    #         st.remove_response(output="VEL", pre_filt=pre_filt, zero_mean=False,
+    #                     taper=False, inventory=inv)
+    #     except ValueError:
+    #         logger.info(
+    #                     f"!Error finding instrumental response: {st[0].stats.network}.{st[0].stats.station,} {starttime}->{endtime}")
+    #         return
+    ##########
+
     try:
         st.interpolate(sampling_rate=40)
     except ValueError:

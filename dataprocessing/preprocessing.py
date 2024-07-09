@@ -176,7 +176,10 @@ def process_kernel(
         st[i].data[masks[i]] = 0
     
     st.trim(starttime, endtime)
-
+    if len(st) == 0:
+        logger.info(
+                f"[{rank}]: {index}/{total} !Error processing data: {net}.{sta} {starttime}->{endtime}")
+        return
     # padding other channels if none
     channels = []
     for tr in st:

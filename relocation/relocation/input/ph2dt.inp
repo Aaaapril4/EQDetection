@@ -1,0 +1,18 @@
+* ph2dt.inp - input control file for program ph2dt
+* Input statio
+station.dat
+* Input phase file:
+phase.dat
+*MINWGHT: min. pick weight allowed [0]
+*MAXDIST: max. distance in km between event pair and stations [200]
+*MAXSEP: max. hypocentral separation in km [10]
+*MAXNGH: max. number of neighbors per event [10]
+*MINLNK: min. number of links required to define a neighbor [8]
+*MINOBS: min. number of links per pair saved [8]
+*MAXOBS: max. number of links per pair saved [20]
+*MINSEP: min. hypocentral separation in km [0]
+*AZBIN:  size of azimuth bin defining the data filter [-1; OFF]
+*DELDIF: if AZBIN > 0 keep obs within AZBIN where delta diff > DELDIF [0]
+*DFAC:	 station to event pair min distance factor [4]
+*MINWGHT MAXDIST MAXSEP MAXNGH MINLNK MINOBS MAXOBS MINSEP AZBIN  DELDIF DFAC
+   0      11000    40     40     6    6      200      1      -1      2     4

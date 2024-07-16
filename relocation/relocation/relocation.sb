@@ -1,0 +1,28 @@
+#!/bin/bash --login
+#BATCH Lines for Resource Request ##########
+ 
+#SBATCH --time=7-00:00:00             # limit of wall clock time - how long the job will run (same as -t)
+#SBATCH --nodes=1                   # number of different nodes - could be an exact number or a range of nodes (same as -N)
+#SBATCH --ntasks=1                    # number of tasks - how many tasks (nodes) that you require (same as -n)
+#SBATCH --cpus-per-task=1          # number of CPUs (or cores) per task (same as -c)
+#SBATCH --mem-per-cpu=400G            # memory required per allocated CPU (or core) - amount of memory (in bytes)
+#SBATCH --job-name=predict             # you can give your job a name for easier identification (same as -J)
+#SBATCH --mail-user=jieyaqi@msu.edu
+#SBATCH --mail-type=ALL
+#SBATCH --account=cmse
+#SBATCH -o relocation
+########## Command Lines to Run ##########
+workdir=/mnt/scratch/jieyaqi/alaska/final/pntf_alaska_all/
+relodir=$workdir/relocation
+cd $relodir
+python3 /mnt/ufs18/home-175/jieyaqi/code/EQDetection/relocation/generate_phase_dd.py 1 $workdir/picks_gamma.csv $workdir/catalogs_gamma.csv input
+cd input
+/mnt/home/jieyaqi/code/tomodd/ph2dt/ph2dt-jp4 ph2dt.inp
+awk -f ph2abs.awk phase.dat
+awk -f extract_absolute_SP.awk absolute.dat
+awk -f extract_dtct_SP.awk dt.ct
+
+cd ..
+/mnt/home/jieyaqi/code/tomodd/tomoDD_VpVs/tomoSPDR2.1_SP tomodd.inp
+
+scontrol show job $SLURM_JOB_ID     ### write job information to output file

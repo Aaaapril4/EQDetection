@@ -18,7 +18,7 @@ def filter_picks(picks: pd.DataFrame, ampP: float, ampS: float) -> pd.DataFrame:
     picks = pd.concat([picksP, picksS])
     picks.columns = ["network", "station", "type", "timestamp", "prob"]
     picks['id'] = picks.apply(lambda x: f'{x["network"]}.{x["station"]}..BH'.replace(' ', ''), axis = 1) # I use BH for all for convinience
-    return picks[["id", "network", "station", "type", "timestamp", "prob"]]
+    return picks[["id", "type", "timestamp", "prob"]]
 
 
 def get_config() -> dict:

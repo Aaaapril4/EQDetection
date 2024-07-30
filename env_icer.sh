@@ -14,9 +14,15 @@ source ~/phasenet-tf/bin/activate
 conda create -n pntf python=3.11.3
 conda activate pntf
 
+# Install mseed
+git clone https://github.com/EarthScope/mseedindex.git
+cd mseedindex
+make
+cd ..
+
+# Install PhaseNet-TF
 git clone https://github.com:Aaaapril4/PhaseNet-TF.git
 conda install conda-forge::poetry
-
 cd PhaseNet-TF
 rm *lock
 poetry install --with train

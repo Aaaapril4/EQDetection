@@ -2,6 +2,7 @@
 from obspy.clients.filesystem.tsindex import Indexer
 from mpi4py import MPI
 import numpy as np
+import os
 
 comm = MPI.COMM_WORLD  # pylint: disable=c-extension-no-member
 size = comm.Get_size()
@@ -41,6 +42,8 @@ if __name__ == "__main__":
     # use mpi for multiple directory
     # process_list_this_rank = get_process_list_this_rank(38, 117)
     # index_rank()
+    if not os.path.exists('./data'):
+        os.mkdir('./data')
 
     # run for one case, usage: per_index(directory, outputfile)
     per_index('./data/waveform', 'data/data.sqlite')
